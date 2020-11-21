@@ -62,22 +62,25 @@ df_bicycle = df_bicycle[["date", "mois", "jour", "heure", "departement",
                          "conditions atmosperiques", "gravite accident",
                          "sexe", "age", "existence securite"]]
 df_bicycle["heure"].replace("", np.nan, inplace=True)
-df_bicycle["age"].replace(["2004-2005", "2016-2017", "2006-2007", "2012-2013", "2013-2014",
-                           '2005-2006', "2006-2007"], np.nan, inplace=True)
+df_bicycle["age"].replace(["2004-2005", "2016-2017", "2006-2007",
+                           "2012-2013", "2013-2014",
+                           "2005-2006", "2006-2007"], np.nan, inplace=True)
 df_bicycle["existence securite"].replace("Inconnu", np.nan, inplace=True)
 df_bicycle.dropna(inplace=True)
-df_bicycle.rename(columns={"conditions atmosperiques": "conditions atmospheriques",
-                           "gravite accident": "gravite_accident"}, inplace=True)
+df_bicycle.rename(columns={"conditions atmosperiques":
+                           "conditions atmospheriques",
+                           "gravite accident":
+                           "gravite_accident"}, inplace=True)
 
 ##############################
 # Handling dates and time
 ##############################
 
 df_bicycle.set_index(pd.to_datetime(df_bicycle["heure"] + "/00 "+
-                            df_bicycle["date"],
-                            format="%H/%M %Y-%m-%d"), inplace=True)
+                     df_bicycle["date"],
+                     format="%H/%M %Y-%m-%d"), inplace=True)
 df_bicycle.drop(columns=["date"], inplace=True)
-df_bicycle = df_bicycle[df_bicycle.index.year!=2018]
+df_bicycle = df_bicycle[df_bicycle.index.year != 2018]
 
 ###############################
 # Let's see what are the unique values inside our dataset now.
@@ -92,7 +95,7 @@ print(df_bicycle.info)
 ##################################
 # Data visualization
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 
+#
 # Let's take a look at some of our variables and
 # their connections.
 #
@@ -115,8 +118,9 @@ plt.show()
 # Accident gravity and security
 #################################
 
-print(pd.crosstab(df_bicycle['existence securite'], df_bicycle['gravite_accident'],
-                  normalize='index', margins=True)*100)
+print(pd.crosstab(df_bicycle['existence securite'],
+                  df_bicycle['gravite_accident'],
+                  normalize='index', margins=True) * 100)
 
 #################################
 # We can see that amongst our accidents with people wearing a helmet
@@ -132,12 +136,12 @@ print(pd.crosstab(df_bicycle['existence securite'], df_bicycle['gravite_accident
 
 df_bicycle["heure"] = pd.to_numeric(df_bicycle["heure"])
 
-fig, ax = plt.subplots(figsize=(8,5))
+fig, ax = plt.subplots(figsize=(8, 5))
 ax = sns.violinplot(x="gravite_accident", y="heure", data=df_bicycle)
 ax.set_xlabel('Accident gravity')
 ax.set_ylabel('Hour')
 ax.set_xticklabels(ax.get_xticklabels(), rotation=45, fontsize='small')
-plt.ylim([0,24])
+plt.ylim([0, 24])
 plt.title("When are happening the most dangerous accidents?")
 plt.tight_layout()
 plt.show()
@@ -155,7 +159,8 @@ df_bicycle.groupby([df_bicycle.index.weekday, df_bicycle.index.hour])[
     'sexe'].count().unstack(level=0).plot()
 plt.legend(labels=['Monday', "Tuesday", "Wednesday",
                    "Thursday", "Friday", "Saturday", "Sunday"])
-plt.ylabel("Number of accidents"); plt.xlabel("Hours")
+plt.ylabel("Number of accidents")
+plt.xlabel("Hours")
 plt.savefig(os.path.join(script_dir, "images", "number_accidents_day.pdf"))
 plt.show()
 
@@ -166,18 +171,19 @@ plt.show()
 #
 # Let's test :math:`H_0:\mu_{monday}=\mu_{tuesday}=\dots=\mu_{sunday}`
 # against :math:`H_1:` one distribution of the accidents for a day have a different
-# mean than another one. 
+# mean than another one.
 # For that we first take a look at the distribution of each number of accidents by day
 # using a violin plot.
 
 data_days = df_bicycle.to_period("M")
 data_days = data_days.pivot_table(index=data_days.index, columns='jour', aggfunc='size')
 
-days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-data_days = pd.DataFrame({"days": days*int(data_days.shape[0]),
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+        "Saturday", "Sunday"]
+data_days = pd.DataFrame({"days": days * int(data_days.shape[0]),
                          "number_accident": data_days.stack().values})
 
-fig, ax = plt.subplots(figsize=(8,5))
+fig, ax = plt.subplots(figsize=(8, 5))
 ax = sns.violinplot(x="days", y="number_accident", data=data_days)
 ax.set_ylabel("Number of accidents")
 ax.set_xlabel('Days')
@@ -199,7 +205,7 @@ _, (__, ___, r) = sp.stats.probplot(resid_days, plot=ax, fit=True)
 # The p⁻value is way below :math:`\alpha`. We can reject :math:`H_0`.
 # In conclusion we can say that there is an individual effect amongst the days.
 # We already saw that there is at least the weekday/weekend effect.
-# 
+#
 # The normality of the errros can also be assumed (for the most part,
 # the observed values fit to the theoretical quantiles).
 #
@@ -212,10 +218,12 @@ _, (__, ___, r) = sp.stats.probplot(resid_days, plot=ax, fit=True)
 # We want to test :math:`H_0: \mu_{morning}=\mu_{afternoon}` ie there is no
 # individual effect from each time-duration against the hypothesis that there is one.
 
-heures = df_bicycle.heure.isin(["6", "7", '8', '9', '10', "11", '12', '13', "14", "15", "16", "17", "18", "19", "20"])
+heures = df_bicycle.heure.isin(["6", "7", '8', '9', '10', "11", '12', '13',
+                                "14", "15", "16", "17", "18", "19", "20"])
 df_all = df_bicycle[heures]
 df_all = df_all.copy()
-df_all["daytime"] = df_all.heure.isin(["6", "7", '8', '9', '10', "11", '12', "13"])
+df_all["daytime"] = df_all.heure.isin(["6", "7", '8', '9', '10',
+                                       "11", '12', "13"])
 df_all['daytime'].replace(True, "matin", inplace=True)
 df_all['daytime'].replace(False, "apres_midi", inplace=True)
 
@@ -233,9 +241,9 @@ plt.show()
 # accidents during the afternoon, let's take a look at the distributions.
 
 data = pd.DataFrame({"accident_number": data.stack().values,
-                     "daytime": ['6-13h', '14-20h']*int(data.shape[0])})
+                     "daytime": ['6-13h', '14-20h'] * int(data.shape[0])})
 
-fig, ax = plt.subplots(figsize=(8,5))
+fig, ax = plt.subplots(figsize=(8, 5))
 ax = sns.violinplot(x="daytime", y="accident_number", data=data)
 ax.set_ylabel("Number of accidents")
 ax.set_xlabel('Daytime')
@@ -258,7 +266,7 @@ fig, ax = plt.subplots()
 _, (__, ___, r) = sp.stats.probplot(resid_acc, plot=ax, fit=True)
 
 #####################################
-# The normality of the residuals can be assumed and the 
+# The normality of the residuals can be assumed and the
 # ANOVA p-value is under our threshold so there is an indivual
 # effect from our groups. Considering our visualizations, we can
 # conclude that the number of accidents during the afternoon is,
@@ -267,20 +275,22 @@ _, (__, ___, r) = sp.stats.probplot(resid_acc, plot=ax, fit=True)
 ######################################
 # Permutation test
 # ------------------------------------
-# 
+#
 # Monte-Carlo based non-parametric method.
 # Simulation of the over-simplified medical protocol described in
 # the beamer presentatioon. We test the effect of the treatment (B) against
 # a control group (A).
 
+
 class Treatment_test_simulation():
 
-    def __init__(self, nb_patients, mean_A=None, mean_B=None, nb_permut=None, setseed=True):
+    def __init__(self, nb_patients, mean_A=None, mean_B=None,
+                 nb_permut=None, setseed=True):
         if (nb_patients % 2) != 0:
             nb_patients += 1  # only even number is easier
         self.n = nb_patients
         if mean_A is None:  # A=control ie gaussian mean effect is 3
-            mean_A = 3 
+            mean_A = 3
             # A : miracle drug against COVID without memory in the system
         if mean_B is None:
             mean_B = 7  # B = test ie exponential mean effect is 7
@@ -347,20 +357,20 @@ class Treatment_test_simulation():
         return pval, ref_
 
 
-##################################
+###############################################################################
 # Let's perform it on two cases, the first where we reject :math:`H_0: \mu_A=\mu_B`
 #  against :math:`H_1:\mu_A\geq \mu_B`
 
 test_reject = Treatment_test_simulation(50, setseed=True, nb_permut=300)
-pval, _ =test_reject.perform_test()
+pval, _ = test_reject.perform_test()
 print("The p-value is {:.4f} < 5%".format(pval))
 
 ###################################
 # We conclude that the treatment has a positive effect, there is a significant difference
 # between the averages oof the distribution.
 
-test_not_reject = Treatment_test_simulation(50, mean_A = 2, mean_B = 2.5,
-                                             setseed=True, nb_permut=300)
+test_not_reject = Treatment_test_simulation(50, mean_A=2, mean_B=2.5,
+                                            setseed=True, nb_permut=300)
 pval, _ = test_not_reject.perform_test()
 print("The p-value is {:.4f} > 5%".format(pval))
 
@@ -368,21 +378,18 @@ print("The p-value is {:.4f} > 5%".format(pval))
 # We can"t say that there is a significative difference between the tested group and
 # the control one.
 
-
-
 ####################################
 # Pollution dataset
-#----------------------------------
 #
 # Datasets recording informations about the concentration of pollution in few cities from 2017 to 2018.
 #
 # Work selection on the variable
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+###############################################################################
 
 df = pd.read_csv(path_target)
-df= df.loc[:, ["polluant", 'nom_com', "valeur_originale"]]
-#creation du tableau ne contenant que ces villes et O3 comme polluant
-df = df.loc[df["nom_com"].isin(["MONTPELLIER","NIMES", "TARBES", "CASTRES"])]
+df = df.loc[:, ["polluant", 'nom_com', "valeur_originale"]]
+# creation du tableau ne contenant que ces villes et O3 comme polluant
+df = df.loc[df["nom_com"].isin(["MONTPELLIER", "NIMES", "TARBES", "CASTRES"])]
 df = df.loc[df["polluant"].isin(["O3"])]
 
 #######################################################################################
@@ -390,7 +397,7 @@ df = df.loc[df["polluant"].isin(["O3"])]
 ########################################################################################
 
 fig = sns.catplot(x=df.columns[1], y="valeur_originale",
-         data=df, kind="violin", legend=False)
+                  data=df, kind="violin", legend=False)
 plt.title("O3 by city")
 plt.xlabel("cities")
 plt.ylabel("Concentration of O3")
@@ -417,36 +424,37 @@ print(df.describe())
 
 df_mois = pd.read_csv(path_target, index_col="date_debut")
 df_mois = df_mois.loc[:, ["polluant", 'nom_com', "valeur_originale"]]
-df_mois = df_mois.loc[df_mois["nom_com"].isin(["MONTPELLIER","NIMES", "TARBES", "CASTRES"])]
+df_mois = df_mois.loc[df_mois["nom_com"].isin(["MONTPELLIER", "NIMES", "TARBES", "CASTRES"])]
 df_mois = df_mois.loc[df_mois["polluant"].isin(["O3"])]
-df_mois.set_index(pd.to_datetime(df_mois.index, format = "%Y-%m-%d"), inplace=True)
+df_mois.set_index(pd.to_datetime(df_mois.index, format="%Y-%m-%d"),
+                  inplace=True)
 
-tab = pd.DataFrame(columns=["mois","O3"])
+tab = pd.DataFrame(columns=["mois", "O3"])
 tab = df_mois.loc[df_mois["nom_com"].isin(["TARBES"])]
 y1 = np.ones(12)
 x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-for i in x :
-    tab1 = tab.loc[tab.index.month==i]
-    y1[i-1] = np.mean(tab1['valeur_originale'])
+for i in x:
+    tab1 = tab.loc[tab.index.month == i]
+    y1[i - 1] = np.mean(tab1['valeur_originale'])
 
 tab2 = tab = df_mois.loc[df_mois["nom_com"].isin(["NIMES"])]
 y2 = np.ones(12)
-for i in x :
-    tab2 = tab.loc[tab.index.month==i]
-    y2[i-1] = np.mean(tab2['valeur_originale']) 
+for i in x:
+    tab2 = tab.loc[tab.index.month == i]
+    y2[i - 1] = np.mean(tab2['valeur_originale'])
 
 tab3 = tab = df_mois.loc[df_mois["nom_com"].isin(["MONTPELLIER"])]
 y3 = np.ones(12)
-for i in x :
-    tab3 = tab.loc[tab.index.month==i]
-    y3[i-1] = np.mean(tab3['valeur_originale']) 
+for i in x:
+    tab3 = tab.loc[tab.index.month == i]
+    y3[i - 1] = np.mean(tab3['valeur_originale'])
 
 tab4 = tab = df_mois.loc[df_mois["nom_com"].isin(["CASTRES"])]
 y4 = np.ones(12)
-for i in x :
-    tab4 = tab.loc[tab.index.month==i]
-    y4[i-1] = np.mean(tab4['valeur_originale']) 
-   
+for i in x:
+    tab4 = tab.loc[tab.index.month == i]
+    y4[i - 1] = np.mean(tab4['valeur_originale'])
+
 fig = plt.figure()
 plt.plot(x, y1, label="Tarbes")
 plt.plot(x, y2, label="Nimes")
@@ -461,7 +469,7 @@ plt.savefig(os.path.join(script_dir, "images", "Mean_of_O3.pdf"))
 plt.show()
 
 ##############################################################
-# We can see that these curves are roughly the same profil : 
+# We can see that these curves are roughly the same profil :
 # there is an augmentation between January and July, then the pollution declines.
 # Nimes is the city who has the more important mean of concentration. It's located in July.
 # Tarbes is the city who has the smallest mean of concentration. It's located in November.
@@ -469,21 +477,19 @@ plt.show()
 
 ##############################################
 # ANOVA model : O3 concentration by cities
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-poll = ols('valeur_originale ~ C(nom_com)',data=df).fit()
+poll = ols('valeur_originale ~ C(nom_com)', data=df).fit()
 print(poll.summary())
-pollution = sm.stats.anova_lm(poll, typ=2) 
+pollution = sm.stats.anova_lm(poll, typ=2)
 print(pollution)
 fig, ax = plt.subplots()
 _, (__, ___, r) = sp.stats.probplot(poll.resid, plot=ax, fit=True)
 plt.savefig(os.path.join(script_dir, "images", "Verification_of_residues.pdf"))
 plt.show()
 
-
 ###############################################################################################
 # We can see that the residuals follow the normal distribution thanks to the Probability Plot.
 # We have the hypothesis H_0 :math:'\mu_{Montpellier}=\mu_{Castres}=\mu_{Tarbes}=\mu_{Nimes}' and :math:'\alpha=0.05'
-# The p-value is lower than :math:'\alpha so we reject H_0'. 
+# The p-value is lower than :math:'\alpha so we reject H_0'.
 # These cities haven't the same mean of O3 pollution.
 ################################################################################################
