@@ -1,11 +1,11 @@
 \documentclass[unknownkeysallowed]{beamer}
 \usepackage[french,english]{babel}
-\usepackage{./OrganizationFiles/tex/sty/beamer_js}
-\usepackage{./OrganizationFiles/tex/sty/shortcuts_js}
+% \usepackage{./OrganizationFiles/tex/sty/beamer_js}
+% \usepackage{./OrganizationFiles/tex/sty/shortcuts_js}
 
 % % package for JS compilation:
-% \usepackage{/home/jo/Documents/OrganizationFiles/tex/sty/beamer_js}
-% \usepackage{/home/jo/Documents/OrganizationFiles/tex/sty/shortcuts_js}
+\usepackage{/home/jo/Documents/OrganizationFiles/tex/sty/beamer_js}
+\usepackage{/home/jo/Documents/OrganizationFiles/tex/sty/shortcuts_js}
 \usepackage{csquotes}
 
 \graphicspath{{./images/}}
@@ -369,7 +369,7 @@ Meaning that:
 \textbf{Protocol (Monte-Carlo):}
 \begin{itemize}
     \visible<1->{\item $2$ groups: A the control and B the test, we test the effect of the treatment,}
-    \visible<2->{\item $H0$: $\mu_A^* \geq \mu_B^*$ (Test if the treatment is better),}
+    \visible<2->{\item $H_0$: $\mu_A^* \geq \mu_B^*$ (Test if the treatment is better),}
     \visible<3->{\item Assign values for the effect of the treatment,}
     \visible<4->{\item Get the reference statistic: $\hat\mu_B - \hat\mu_A$,}
     \visible<5->{\item shuffle the groups and recalculate the test statistic $J$ times,}
@@ -380,17 +380,121 @@ Meaning that:
 \begin{column}[T]{.48\textwidth}
 \vspace{-.35cm}
 	\begin{figure}[!tbp]
-    \includegraphics[width=\textwidth, clip, trim={0cm 0.2cm 0cm .5cm}]{rejet.pdf}
-    \caption{\tiny{$\mu_A^*=3,\ \mu_B^*=7$, we reject the equality.}}
+    \includegraphics[width=0.87\textwidth, clip, trim={0cm 0.2cm 0cm .5cm}]{rejet.pdf}
+    {\tiny{$\mu_A^*=3,\ \mu_B^*=7$, we reject the equality.}}
 \end{figure}
 \vspace{-.45cm}
 \begin{figure}
-    \includegraphics[width=\textwidth, clip, trim={0cm 0.2cm 0cm .5cm}]{not_rejet.pdf}
-    \caption{\tiny{$\mu_A^*=2, \ \mu_B^*=2.5$, we don't reject the equality.}}
+    \includegraphics[width=0.87\textwidth, clip, trim={0cm 0.2cm 0cm .5cm}]{not_rejet.pdf}
+    {\tiny{$\mu_A^*=2, \ \mu_B^*=2.5$, we don't reject the equality.}}
 \end{figure}
 
 \end{column}
 \end{columns}
+\end{frame}
+
+
+
+
+\begin{frame}{Case: $\alpha_{i_0}=0$}
+
+Our 3 hypotheses:
+
+\begin{itemize}
+    \item $\sum\limits_{i=1}^{I}\alpha_u=0$
+
+    \item $\sum\limits_{i=1}^{I}\alpha_ix_i=0$
+
+    \item $\alpha_{i_0}=0$
+\end{itemize}
+
+
+\visible<2>{
+
+Associated estimator:
+
+
+\[\min_{(\mu,\alpha)\in\mathbb{R}\times\mathbb{R}^I}\frac{1}{2}\sum\limits_{i=1}^{I}\sum\limits_{j=1}^{n}(\mu+\alpha_i-y_{i,j})^2\]
+\[\mathcal{L}(\mu,\alpha,\lambda)=\sum\limits_{i=1}^{I}\sum\limits_{j=1}^{n}(\mu+\alpha_i-y_{i,j})^2+\lambda\alpha_{i_0}\]
+}
+
+\end{frame}
+
+\begin{frame}{Case: $\alpha_{i_0}=0$}
+\begin{itemize}
+    \item $i\ne i_0: \frac{\partial\mathcal{L}}{\partial\alpha_i}=\sum\limits_{i=1}^{n_i}[\hat{\mu}+\hat{\alpha_i}-y_{i,j}]=0\;\;\; (*)$
+    \item $i=i_0: \frac{\partial\mathcal{L}}{\partial\alpha_{i_0}}=\sum\limits_{i=1}^{n_i}[\hat{\mu}+\hat{\alpha_i}-y_{i,j}]+\hat{\lambda}=0\;\;\; (**)$
+    \item $\hat{\mu}=y_{i_0,j}-\hat{\lambda}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Case: $\alpha_{i_0}=0$}
+\begin{align}
+\sum\limits_{i\ne i_0}(*)+(**)&=\sum\limits_{i\ne i_0}\sum\limits_{j=1}^{n_{i_0}}\hat{\mu}+\sum\limits_{j=1}^{n_{i_0}}\hat{\mu}+\sum\limits_{i\ne i_0}\hat{\alpha_i}+n_{i_0}\hat{\alpha}_{i_0}-\sum\limits_{i\ne i_0}\sum\limits_{j}y_{i,j}\\
+&-\sum\limits_{j=1}^{n_{i_0}}y_{i,j}\\
+&= \sum\limits_{i}\sum\limits_{j}\hat{\mu} +\sum\limits_{i}n_i\hat{\alpha_i}-\sum\limits_{i}\sum\limits_{j}y_{i,j}+\hat{\lambda}\\
+&=0
+\end{align}
+\end{frame}
+
+\begin{frame}{Case: $\alpha_{i_0}=0$}
+\[\sum\limits_{i\ne i_0}n_i\hat{\mu}+\sum\limits_{i\ne i_0}n_i\hat{\alpha}_i-\sum\limits_{i\ne i_0}\sum\limits_{j}y_{i,j}=0\]
+
+With the previous equation:
+
+\[n_{i_0}\hat{\mu}+n_{i_0}\hat{\alpha}_{i_0}-\sum\limits_{j=1}^{n_{i_0}}y_{i,j}+\hat{\lambda}=0\]
+
+\begin{align*}
+&\Longrightarrow \hat{\mu}+\hat{\alpha}_]{i_0}-\bar{y}_{i_0}+\frac{\hat{\lambda}}{n_{i_0}}\\
+&\Longrightarrow \hat{\mu}=\bar{y}_{i,:}-\frac{\hat{\lambda}}{n_{i_0}}
+\end{align*}
+\end{frame}
+
+\begin{frame}{Case: $\alpha_{i_0}=0$}
+\begin{align*}
+&n_i(\bar{y}_{i_0,:}-\frac{\hat{\lambda}}{n_{i_0}})+n_i\hat{\alpha}_i-n_i\bar{y}_{i,:}=0\\
+&\Longrightarrow \hat{\alpha}_i=\frac{\hat{\lambda}}{n_{i_0}}-\bar{y_{i_0,:}+\bar{y_{i,:}}}
+\end{align*}
+We admit that $\hat{\lambda}=0$
+\begin{align*}
+    \Longrightarrow \begin{cases}
+\hat{\alpha}_i=\bar{y}_{i,:}-\bar{y}_{i_0,:} \\
+\hat{\alpha}_{i_0}=0\\
+\hat{\mu}=\bar{y}_{i_0,:}\\
+\frac{\partial \mathcal{L}}{\partial \hat\alpha_{i_0}}=0\ \forall i_0
+\end{cases}
+\end{align*}
+\end{frame}
+
+\begin{frame}{Variance estimator}
+    \[\hat{\sigma}^2=\frac{1}{n-I}\sum\limits_{i=1}^{I}\sum\limits_{j=i}^{n_i}(\bar{y}_{i,:}-_{i,j})^2\]
+    \begin{itemize}
+        \item $n-I$: Correcton so that $\mathbb{E}(\hat{\sigma}^2)=\sigma^2$
+        \item $y_{i,j}=\mu^{*}+\epsilon_{i,j}$
+        \item $\epsilon_{i,j}\sim\mathcal{N}(0,\sigma^2)$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Variance estimator}
+\begin{alertblock}{Notice : }
+$X=[\ind_{c_1},\dots,\ind_{c_I}]\in \mathbb{R}^{n\times I}$:
+
+\[\frac{1}{n-rg(X)} \norm{y-X\hat{\beta}^{LS}}^2 \text{ unbiased estimator of } \sigma^2\]
+
+$\sum\limits_{i=1}^{I}\ind_{c_i}=\ind_n$
+$rg(\Tilde{X})=I,\Tilde{X}=[\ind_n,\ind_{c_n},\dots,\ind_{c_I}]$
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Test: "are the terms different"}
+\begin{alertblock}{Our $H_0$}
+$H_0:\mu_{1}^{*}=\mu_{2}^{*}=\dots=\mu_{I}^{*}$
+\end{alertblock}
+\begin{itemize}
+    \item $F_{obs}=\frac{\frac{1}{I-1}\sum\limits_{i=1}^{I}(\bar{y}_{i,:}-\bar{y}_n)^2}{\hat{\sigma}^2}$ with: $F_{obs}\sim\Tilde{F}^{I-1}_{n-I}$
+    \item We reject the test: $F_{obs}>F^{I-1}_{n-I}(1-\alpha)$ (if we want to test $\alpha$)
+\end{itemize}
+
 \end{frame}
 
 
